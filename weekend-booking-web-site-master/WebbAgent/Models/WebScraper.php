@@ -9,8 +9,18 @@ class WebScraper{
 
     private $frontPage = "//li/a";
 
+    private $calendarTbody = '//table[@class="striped centered responsive-table"]/tbody/tr//td';
+
+    private $calendarThead = '//table[@class="striped centered responsive-table"]/thead/tr//th';
+
+    private $calendarMaryTbody = '//table[@class="centered striped responsive-table"]/tbody/tr//td';
+
+    private $calendarMaryThead = '//table[@class="centered striped responsive-table"]/thead/tr//th';
 
     private $baseUrl = 'localhost:8080';
+
+    //private $arrayOfAvailableDays = array();
+
 
     public function webScrape() {
 
@@ -30,7 +40,6 @@ class WebScraper{
                 $linksFrontPage[] = $items;
             }
 
-
         }
         else {
             die("Fel vid inläsning av första länkarna");
@@ -38,13 +47,40 @@ class WebScraper{
 
     }
 
+    public function test(){
+        $this->ScrapePaulsDays($this->linksPaulsCalendarDays);
+    }
+
     public function ScrapeCalendar() {
 
-        $data = $this->curl_get_request($this->baseUrl ."/calendar/");
+    $data = $this->curl_get_request($this->baseUrl ."/calendar/");
+
+    $dom = new \DomDocument();
+
+    $linksCalendar = array();
+
+    if($dom->loadHTML($data)){
+
+        $xpath = new \DOMXPath($dom);
+        $items = $xpath->query($this->frontPageCalendar);
+
+        foreach($items as $item){
+            var_dump($item->getAttribute("href"));
+            $linksCalendar[] = $items;
+        }
+    }
+    else{
+        die("Fel vid inläsning av kalendern");
+    }
+}
+    /*
+    public function ScrapeCinema() {
+
+        $data = $this->curl_get_request($this->baseUrl ."/cinema/");
 
         $dom = new \DomDocument();
 
-        $linksCalendar = array();
+        $linksCinema = array();
 
         if($dom->loadHTML($data)){
 
@@ -53,110 +89,79 @@ class WebScraper{
 
             foreach($items as $item){
                 var_dump($item->getAttribute("href"));
-                $linksCalendar[] = $items;
+                $linksCinema[] = $items;
             }
         }
         else{
-            die("Fel vid inläsning av kalendern");
+            die("Fel vid inläsning av biografen");
+        }
+    }
+    */
+
+    private function EngToSwe($day){
+        switch($day){
+            case "friday":
+                return "Fredag";
+            case "saturday":
+                return "Lördag";
+            case "sunday":
+                return "Söndag";
         }
     }
 
-    private $calendarThead = '//table[@class="striped centered responsive-table"]/thead/tr//th';
-    public function ScrapePaulDays() {
+    public function ScrapePaulsDays() {
         $data = $this->curl_get_request($this->baseUrl ."/calendar/paul.html");
 
         $dom = new \DomDocument();
 
-        $linksPaulCalendarDays = array();
+        $linksPaulsCalendarDays = array();
 
         if($dom->loadHTML($data)){
 
             $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarThead);
+            $days = $xpath->query($this->calendarThead);
+            $Ok = $xpath->query($this->calendarTbody);
 
-            foreach($items as $item){
-                var_dump($item->nodeValue);
-                $linksPaulCalendarDays[] = $items;
+            for ($i = 0; $i < $days->length; $i++) {
+                $linksPaulsCalendarDays[$days[$i]->nodeValue] = $Ok[$i]->nodeValue;
             }
+
+            return $linksPaulsCalendarDays;
         }
         else{
             die("Fel vid inläsning av Pauls dagar");
         }
-
     }
 
 
+        public function ScrapePetersDays() {
+            $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
 
-    private $calendarTbody = '//table[@class="striped centered responsive-table"]/tbody/tr//td';
-    public function ScrapePaulOk(){
-        $data = $this->curl_get_request($this->baseUrl . "/calendar/paul.html");
+            $dom = new \DomDocument();
 
-        $dom = new \DomDocument();
+            $linksPetersCalendarDays = array();
 
-        $linksPaulCalendarOk = array();
+            if($dom->loadHTML($data)){
 
-        if ($dom->loadHTML($data)) {
+                $xpath = new \DOMXPath($dom);
+                $days = $xpath->query($this->calendarThead);
+                $Ok = $xpath->query($this->calendarTbody);
 
-            $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarTbody);
+                for ($i = 0; $i < $days->length; $i++) {
+                    $linksPetersCalendarDays[$days[$i]->nodeValue] = $Ok[$i]->nodeValue;
+                }
 
-            foreach ($items as $item) {
-                var_dump($item->nodeValue);
-                $linksPaulCalendarOk[] = $items;
+                return $linksPetersCalendarDays;
+
+            }
+            else{
+                die("Fel vid inläsning av Peters dagar");
             }
         }
-        else {
-            die("Fel vid inläsning av Pauls dagar");
-        }
-    }
 
-    public function ScrapePetersDays() {
-        $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
-
-        $dom = new \DomDocument();
-
-        $linksPeterCalendarDays = array();
-
-        if($dom->loadHTML($data)){
-
-            $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarThead);
-
-            foreach($items as $item){
-                var_dump($item->nodeValue);
-                $linksPeterCalendarDays[] = $items;
-            }
-        }
-        else{
-            die("Fel vid inläsning av Peters dagar");
-        }
-
-    }
-
-    public function ScrapePeterOk(){
-        $data = $this->curl_get_request($this->baseUrl . "/calendar/paul.html");
-
-        $dom = new \DomDocument();
-
-        $linksPeterCalendarOk = array();
-
-        if ($dom->loadHTML($data)) {
-
-            $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarTbody);
-
-            foreach ($items as $item) {
-                var_dump($item->nodeValue);
-                $linksPeterCalendarOk[] = $items;
-            }
-        }
-        else {
-            die("Fel vid inläsning av Peters dagar");
-        }
-    }
 
     public function ScrapeMarysDays() {
-        $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
+        $data = $this->curl_get_request($this->baseUrl ."/calendar/mary.html");
 
         $dom = new \DomDocument();
 
@@ -165,39 +170,37 @@ class WebScraper{
         if($dom->loadHTML($data)){
 
             $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarThead);
+            $days = $xpath->query($this->calendarMaryTbody);
+            $ok = $xpath->query($this->calendarMaryThead);
 
-            foreach($items as $item){
-                var_dump($item->nodeValue);
-                $linksMarysCalendarDays[] = $items;
+            for ($i = 0; $i < $days->length; $i++) {
+                $linksMarysCalendarDays[$days[$i]->nodeValue] = $ok[$i]->nodeValue;
             }
+            return $linksMarysCalendarDays;
+
         }
         else{
             die("Fel vid inläsning av Marys dagar");
         }
-
     }
 
-    public function ScrapeMaryOk(){
-        $data = $this->curl_get_request($this->baseUrl . "/calendar/paul.html");
+    /*
+    public function CheckDays(){
+        if($this->ScrapePaulOk() && $this->ScrapeMaryOk() && $this->ScrapePeterOk()){
 
-        $dom = new \DomDocument();
-
-        $linksMarysCalendarOk = array();
-
-        if ($dom->loadHTML($data)) {
-
-            $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->calendarTbody);
-
-            foreach ($items as $item) {
-                var_dump($item->nodeValue);
-                $linksMarysCalendarOk[] = $items;
-            }
         }
-        else {
-            die("Fel vid inläsning av Marys dagar");
-        }
+    }
+    */
+
+    public function CombineDays(){
+        $arr = array();
+        $arr[] = $this->ScrapeMarysDays();
+        $arr[] = $this->ScrapePaulsDays();
+        $arr[] = $this->ScrapePetersDays();
+        $days = call_user_func_array('array_intersect_assoc', $arr);
+
+        var_dump($days);
+
     }
 
     public function curl_get_request($url){
