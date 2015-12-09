@@ -15,6 +15,11 @@ ini_set('display_errors', 1);
 
 $mjö = new \models\WebScraper();
 $mjö->ScrapePaulOk();
+$flö = new \models\WebScraper();
+$flö->ScrapePeterOk();
+$glö = new \models\WebScraper();
+$glö->ScrapeMaryOk();
+
 
 //$LayoutView = new \Views\LayoutView("utf-8");
 //echo $LayoutView ->Layout("häst","<h1>katt</h1>");

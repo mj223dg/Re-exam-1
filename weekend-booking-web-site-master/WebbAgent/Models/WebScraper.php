@@ -57,7 +57,7 @@ class WebScraper{
             }
         }
         else{
-            die("Fel vid inläsning av kalender");
+            die("Fel vid inläsning av kalendern");
         }
     }
 
@@ -80,7 +80,7 @@ class WebScraper{
             }
         }
         else{
-            die("Fel vid inläsning av pauls dagar");
+            die("Fel vid inläsning av Pauls dagar");
         }
 
     }
@@ -106,7 +106,97 @@ class WebScraper{
             }
         }
         else {
-            die("Fel vid inläsning av pauls dagar");
+            die("Fel vid inläsning av Pauls dagar");
+        }
+    }
+
+    public function ScrapePetersDays() {
+        $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
+
+        $dom = new \DomDocument();
+
+        $linksPeterCalendarDays = array();
+
+        if($dom->loadHTML($data)){
+
+            $xpath = new \DOMXPath($dom);
+            $items = $xpath->query($this->calendarThead);
+
+            foreach($items as $item){
+                var_dump($item->nodeValue);
+                $linksPeterCalendarDays[] = $items;
+            }
+        }
+        else{
+            die("Fel vid inläsning av Peters dagar");
+        }
+
+    }
+
+    public function ScrapePeterOk(){
+        $data = $this->curl_get_request($this->baseUrl . "/calendar/paul.html");
+
+        $dom = new \DomDocument();
+
+        $linksPeterCalendarOk = array();
+
+        if ($dom->loadHTML($data)) {
+
+            $xpath = new \DOMXPath($dom);
+            $items = $xpath->query($this->calendarTbody);
+
+            foreach ($items as $item) {
+                var_dump($item->nodeValue);
+                $linksPeterCalendarOk[] = $items;
+            }
+        }
+        else {
+            die("Fel vid inläsning av Peters dagar");
+        }
+    }
+
+    public function ScrapeMarysDays() {
+        $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
+
+        $dom = new \DomDocument();
+
+        $linksMarysCalendarDays = array();
+
+        if($dom->loadHTML($data)){
+
+            $xpath = new \DOMXPath($dom);
+            $items = $xpath->query($this->calendarThead);
+
+            foreach($items as $item){
+                var_dump($item->nodeValue);
+                $linksMarysCalendarDays[] = $items;
+            }
+        }
+        else{
+            die("Fel vid inläsning av Marys dagar");
+        }
+
+    }
+
+    public function ScrapeMaryOk(){
+        $data = $this->curl_get_request($this->baseUrl . "/calendar/paul.html");
+
+        $dom = new \DomDocument();
+
+        $linksMarysCalendarOk = array();
+
+        if ($dom->loadHTML($data)) {
+
+            $xpath = new \DOMXPath($dom);
+            $items = $xpath->query($this->calendarTbody);
+
+            foreach ($items as $item) {
+                var_dump($item->nodeValue);
+                $linksMarysCalendarOk[] = $items;
+            }
+        }
+        else {
+            die("Fel vid inläsning av Marys dagar");
         }
     }
 
