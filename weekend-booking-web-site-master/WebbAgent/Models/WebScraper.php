@@ -9,13 +9,9 @@ class WebScraper{
 
     private $frontPage = "//li/a";
 
-    private $calendarTbody = '//table[@class="striped centered responsive-table"]/tbody/tr//td';
+    private $calendarTbody = '//table//tbody//tr//td';
 
-    private $calendarThead = '//table[@class="striped centered responsive-table"]/thead/tr//th';
-
-    private $calendarMaryTbody = '//table[@class="centered striped responsive-table"]/tbody/tr//td';
-
-    private $calendarMaryThead = '//table[@class="centered striped responsive-table"]/thead/tr//th';
+    private $calendarThead = '//table//thead//tr//th';
 
     private $baseUrl = 'localhost:8080';
 
@@ -45,10 +41,6 @@ class WebScraper{
             die("Fel vid inläsning av första länkarna");
         }
 
-    }
-
-    public function test(){
-        $this->ScrapePaulsDays($this->linksPaulsCalendarDays);
     }
 
     public function ScrapeCalendar() {
@@ -98,108 +90,44 @@ class WebScraper{
     }
     */
 
-    private function EngToSwe($day){
-        switch($day){
-            case "friday":
-                return "Fredag";
-            case "saturday":
-                return "Lördag";
-            case "sunday":
-                return "Söndag";
-        }
-    }
 
-    public function ScrapePaulsDays() {
-        $data = $this->curl_get_request($this->baseUrl ."/calendar/paul.html");
+    public function ScrapeCalendarDays($href) {
+        $data = $this->curl_get_request($this->baseUrl . $href);
 
         $dom = new \DomDocument();
 
-        $linksPaulsCalendarDays = array();
+        $calendarDays = array();
 
         if($dom->loadHTML($data)){
 
             $xpath = new \DOMXPath($dom);
+            $ok = $xpath->query($this->calendarTbody);
             $days = $xpath->query($this->calendarThead);
-            $Ok = $xpath->query($this->calendarTbody);
+
 
             for ($i = 0; $i < $days->length; $i++) {
-                $linksPaulsCalendarDays[$days[$i]->nodeValue] = $Ok[$i]->nodeValue;
+
+                $calendarDays[strtolower($days->item($i)->nodeValue)] = strtolower($ok->item($i)->nodeValue);
             }
 
-            return $linksPaulsCalendarDays;
-        }
-        else{
-            die("Fel vid inläsning av Pauls dagar");
-        }
-    }
-
-
-        public function ScrapePetersDays() {
-            $data = $this->curl_get_request($this->baseUrl ."/calendar/peter.html");
-
-            $dom = new \DomDocument();
-
-            $linksPetersCalendarDays = array();
-
-            if($dom->loadHTML($data)){
-
-                $xpath = new \DOMXPath($dom);
-                $days = $xpath->query($this->calendarThead);
-                $Ok = $xpath->query($this->calendarTbody);
-
-                for ($i = 0; $i < $days->length; $i++) {
-                    $linksPetersCalendarDays[$days[$i]->nodeValue] = $Ok[$i]->nodeValue;
-                }
-
-                return $linksPetersCalendarDays;
-
-            }
-            else{
-                die("Fel vid inläsning av Peters dagar");
-            }
-        }
-
-
-    public function ScrapeMarysDays() {
-        $data = $this->curl_get_request($this->baseUrl ."/calendar/mary.html");
-
-        $dom = new \DomDocument();
-
-        $linksMarysCalendarDays = array();
-
-        if($dom->loadHTML($data)){
-
-            $xpath = new \DOMXPath($dom);
-            $days = $xpath->query($this->calendarMaryTbody);
-            $ok = $xpath->query($this->calendarMaryThead);
-
-            for ($i = 0; $i < $days->length; $i++) {
-                $linksMarysCalendarDays[$days[$i]->nodeValue] = $ok[$i]->nodeValue;
-            }
-            return $linksMarysCalendarDays;
+            return $calendarDays;
 
         }
         else{
-            die("Fel vid inläsning av Marys dagar");
+            die("Fel vid inläsning av dagarna");
         }
     }
-
-    /*
-    public function CheckDays(){
-        if($this->ScrapePaulOk() && $this->ScrapeMaryOk() && $this->ScrapePeterOk()){
-
-        }
-    }
-    */
 
     public function CombineDays(){
         $arr = array();
-        $arr[] = $this->ScrapeMarysDays();
-        $arr[] = $this->ScrapePaulsDays();
-        $arr[] = $this->ScrapePetersDays();
+        $arr[] = $this->ScrapeCalendarDays("/calendar/peter.html");
+        $arr[] = $this->ScrapeCalendarDays("/calendar/mary.html");
+        $arr[] = $this->ScrapeCalendarDays("/calendar/paul.html");
         $days = call_user_func_array('array_intersect_assoc', $arr);
 
         var_dump($days);
+
+
 
     }
 
@@ -222,6 +150,18 @@ class WebScraper{
 
         return $data;
     }
+
+    private function EngToSwe($days){
+        switch(strtolower($days)){
+            case "friday":
+                return "Fredag";
+            case "saturday":
+                return "Lördag";
+            case "sunday":
+                return "Söndag";
+        }
+    }
+
 }
 
 
