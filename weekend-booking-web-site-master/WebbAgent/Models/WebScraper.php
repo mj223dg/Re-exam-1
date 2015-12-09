@@ -5,9 +5,9 @@ namespace models;
 class WebScraper{
 
 
-    private $frontPageCalendar = '//div[@class="col s12 center"]//li/a';
+   //private $frontPageCalendar = '//div[@class="col s12 center"]//li/a';
 
-    private $frontPage = "//li/a";
+    //private $frontPage = "//li/a";
 
     private $calendarTbody = '//table//tbody//tr//td';
 
@@ -18,6 +18,7 @@ class WebScraper{
     //private $arrayOfAvailableDays = array();
 
 
+    /*
     public function webScrape() {
 
         $data = $this->curl_get_request($this->baseUrl);
@@ -42,7 +43,7 @@ class WebScraper{
         }
 
     }
-
+ /*
     public function ScrapeCalendar() {
 
     $data = $this->curl_get_request($this->baseUrl ."/calendar/");
@@ -118,6 +119,20 @@ class WebScraper{
         }
     }
 
+    public function ScrapeMovieSuggestions($href){
+    $data = $this->curl_get_request($this->baseUrl . $href);
+
+        $dom = new \DOMDocument();
+
+        $movieSuggestions = array();
+
+        if($dom->loadHTML($data)){
+            $xpath = new \DOMXPath ($dom);
+
+        }
+
+    }
+
     public function CombineDays(){
         $arr = array();
         $arr[] = $this->ScrapeCalendarDays("/calendar/peter.html");
@@ -152,7 +167,7 @@ class WebScraper{
     }
 
     private function EngToSwe($days){
-        switch(strtolower($days)){
+        switch($days){
             case "friday":
                 return "Fredag";
             case "saturday":
