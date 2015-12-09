@@ -13,6 +13,10 @@ class WebScraper{
 
     private $calendarThead = '//table//thead//tr//th';
 
+    private $dayQuery = 'select[@id="day"]/option[not(disabled)]';
+
+    private $movieQuery = '';
+
     private $baseUrl = 'localhost:8080';
 
     //private $arrayOfAvailableDays = array();
@@ -124,10 +128,14 @@ class WebScraper{
 
         $dom = new \DOMDocument();
 
-        $movieSuggestions = array();
 
         if($dom->loadHTML($data)){
             $xpath = new \DOMXPath ($dom);
+            $movieDay = $xpath->query($this->dayQuery);
+            $movieQ = $xpath->query($this->movieQuery);
+
+            foreach($movieDay )
+
 
         }
 
