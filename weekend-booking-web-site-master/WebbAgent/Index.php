@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 
 $mjö = new \models\WebScraper();
 
-$mjö->CombineDays();
+$mjö->scrape();
 
 
 

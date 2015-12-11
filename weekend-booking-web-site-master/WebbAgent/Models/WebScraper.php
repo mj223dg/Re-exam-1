@@ -13,90 +13,22 @@ class WebScraper{
 
     private $calendarThead = '//table//thead//tr//th';
 
-    private $dayQuery = 'select[@id="day"]/option[not(disabled)]';
+    private $dayQuery = '//select[@id="day"]/option[not(disabled)]';
 
-    private $movieQuery = '';
+    private $movieQuery = '//select[$id="movie"/option[not(disabled)]';
 
     private $baseUrl = 'localhost:8080';
 
-    //private $arrayOfAvailableDays = array();
+    private $arrayOfAvailableDays = array();
 
-
-    /*
-    public function webScrape() {
-
-        $data = $this->curl_get_request($this->baseUrl);
-
-        $dom = new \DomDocument();
-
-        $linksFrontPage = array();
-
-        if($dom->loadHTML($data)) {
-            $xpath = new \DOMXPath($dom);
-
-            $items = $xpath->query($this->frontPage);
-
-            foreach ($items as $item) {
-                var_dump($item->getAttribute("href"));
-                $linksFrontPage[] = $items;
-            }
-
-        }
-        else {
-            die("Fel vid inläsning av första länkarna");
-        }
-
+    public function scrape() {
+        $this->scrapeCalendars();
+        $this->scrapeMovieSuggestions("/cinema");
     }
- /*
-    public function ScrapeCalendar() {
-
-    $data = $this->curl_get_request($this->baseUrl ."/calendar/");
-
-    $dom = new \DomDocument();
-
-    $linksCalendar = array();
-
-    if($dom->loadHTML($data)){
-
-        $xpath = new \DOMXPath($dom);
-        $items = $xpath->query($this->frontPageCalendar);
-
-        foreach($items as $item){
-            var_dump($item->getAttribute("href"));
-            $linksCalendar[] = $items;
-        }
-    }
-    else{
-        die("Fel vid inläsning av kalendern");
-    }
-}
-    /*
-    public function ScrapeCinema() {
-
-        $data = $this->curl_get_request($this->baseUrl ."/cinema/");
-
-        $dom = new \DomDocument();
-
-        $linksCinema = array();
-
-        if($dom->loadHTML($data)){
-
-            $xpath = new \DOMXPath($dom);
-            $items = $xpath->query($this->frontPageCalendar);
-
-            foreach($items as $item){
-                var_dump($item->getAttribute("href"));
-                $linksCinema[] = $items;
-            }
-        }
-        else{
-            die("Fel vid inläsning av biografen");
-        }
-    }
-    */
 
 
-    public function ScrapeCalendarDays($href) {
+
+    public function scrapeCalendarDays($href) {
         $data = $this->curl_get_request($this->baseUrl . $href);
 
         $dom = new \DomDocument();
@@ -123,33 +55,39 @@ class WebScraper{
         }
     }
 
-    public function ScrapeMovieSuggestions($href){
-    $data = $this->curl_get_request($this->baseUrl . $href);
+    public function scrapeMovieSuggestions($href){
+        $data = $this->curl_get_request($this->baseUrl . $href);
 
         $dom = new \DOMDocument();
 
-
         if($dom->loadHTML($data)){
-            $xpath = new \DOMXPath ($dom);
-            $movieDay = $xpath->query($this->dayQuery);
-            $movieQ = $xpath->query($this->movieQuery);
 
-            foreach($movieDay )
+            $domXpatch = new \DOMXPath($dom);
+
+            $days = $domXpatch->query($this->dayQuery);
+            $movie = $domXpatch->query($this->movieQuery);
+
+            foreach($days as $dayOpt){
+                foreach($movie as $movieOpt){
+                    foreach($this->arrayOfAvailableDays as $day){
+                        if($day === $dayOpt){
+                            $jsonCode = json_decode($this->)
+                        }
+                    }
+                }
+            }
 
 
         }
 
     }
 
-    public function CombineDays(){
+    public function scrapeCalendars(){
         $arr = array();
-        $arr[] = $this->ScrapeCalendarDays("/calendar/peter.html");
-        $arr[] = $this->ScrapeCalendarDays("/calendar/mary.html");
-        $arr[] = $this->ScrapeCalendarDays("/calendar/paul.html");
-        $days = call_user_func_array('array_intersect_assoc', $arr);
-
-        var_dump($days);
-
+        $arr[] = $this->scrapeCalendarDays("/calendar/peter.html");
+        $arr[] = $this->scrapeCalendarDays("/calendar/mary.html");
+        $arr[] = $this->scrapeCalendarDays("/calendar/paul.html");
+        $this->arrayOfAvailableDays = call_user_func_array('array_intersect_assoc', $arr);
 
 
     }
