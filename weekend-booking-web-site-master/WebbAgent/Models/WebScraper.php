@@ -13,13 +13,21 @@ class WebScraper{
 
     private $calendarThead = '//table//thead//tr//th';
 
-    private $dayQuery = '//select[@id="day"]/option[not(disabled)]';
+    private $dayQuery = '//select[@id="day"]/option[not(@disabled)]';
 
-    private $movieQuery = '//select[$id="movie"/option[not(disabled)]';
+    private $movieQuery = '//select[@id="movie"]/option[not(@disabled)]';
 
     private $baseUrl = 'localhost:8080';
 
     private $arrayOfAvailableDays = array();
+
+    private $moveSuggestion = array();
+
+    private $day;
+
+    private $movieName;
+
+    private $time;
 
     public function scrape() {
         $this->scrapeCalendars();
@@ -44,14 +52,14 @@ class WebScraper{
 
             for ($i = 0; $i < $days->length; $i++) {
 
-                $calendarDays[strtolower($days->item($i)->nodeValue)] = strtolower($ok->item($i)->nodeValue);
+                $calendarDays[$this->EngToSwe(strtolower($days->item($i)->nodeValue))] = strtolower($ok->item($i)->nodeValue);
             }
 
             return $calendarDays;
 
         }
         else{
-            die("Fel vid inläsning av dagarna");
+            die("Fel vid inlÃ¤sning av dagarna");
         }
     }
 
@@ -69,15 +77,24 @@ class WebScraper{
 
             foreach($days as $dayOpt){
                 foreach($movie as $movieOpt){
-                    foreach($this->arrayOfAvailableDays as $day){
-                        if($day === $dayOpt){
-                            $jsonCode = json_decode($this->)
+                    foreach($this->arrayOfAvailableDays as $day => $value){
+
+                        if($day === $dayOpt->nodeValue){
+
+                            $json = $this->curl_get_request($this->baseUrl."/cinema/check?day=" . $dayOpt->getAttribute('value') . "&movie=" . $movieOpt->getAttribute('value'));
+                            $jsonCode = json_decode($json, true);
+
+                            foreach($jsonCode as $moviesJson){
+                                if($moviesJson->status === 1){
+
+                                    $this->moveSuggestion[] = new
+                                }
+                            }
+
                         }
                     }
                 }
             }
-
-
         }
 
     }
@@ -96,7 +113,7 @@ class WebScraper{
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_URL, $url);
 
-        //Vad som ska hämtas
+        //Vad som ska hÃ¤mtas
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 
@@ -104,10 +121,10 @@ class WebScraper{
         // Exekvera anropet
         $data = curl_exec($ch);
 
-        // Stäng cUrl resurs
+        // Stï¿½ng cUrl resurs
         curl_close($ch);
 
-        // Skriv ut och se vad vi har fått
+        // Skriv ut och se vad vi har fï¿½tt
 
         return $data;
     }
@@ -117,9 +134,9 @@ class WebScraper{
             case "friday":
                 return "Fredag";
             case "saturday":
-                return "Lördag";
+                return "LÃ¶rdag";
             case "sunday":
-                return "Söndag";
+                return "SÃ¶ndag";
         }
     }
 
