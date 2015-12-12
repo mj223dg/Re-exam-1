@@ -23,15 +23,11 @@ class WebScraper{
 
     private $moveSuggestion = array();
 
-    private $day;
-
-    private $movieName;
-
-    private $time;
 
     public function scrape() {
         $this->scrapeCalendars();
         $this->scrapeMovieSuggestions("/cinema");
+        $this->scrapeDinnerSuggestions("/dinner");
     }
 
 
@@ -70,10 +66,10 @@ class WebScraper{
 
         if($dom->loadHTML($data)){
 
-            $domXpatch = new \DOMXPath($dom);
+            $domXpath = new \DOMXPath($dom);
 
-            $days = $domXpatch->query($this->dayQuery);
-            $movie = $domXpatch->query($this->movieQuery);
+            $days = $domXpath->query($this->dayQuery);
+            $movie = $domXpath->query($this->movieQuery);
 
             foreach($days as $dayOpt){
                 foreach($movie as $movieOpt){
@@ -83,22 +79,36 @@ class WebScraper{
 
                             $json = $this->curl_get_request($this->baseUrl."/cinema/check?day=" . $dayOpt->getAttribute('value') . "&movie=" . $movieOpt->getAttribute('value'));
                             $jsonCode = json_decode($json, true);
-
                             foreach($jsonCode as $moviesJson){
-                                if($moviesJson->status === 1){
+                                if($moviesJson["status"] === 1){
 
-                                    $this->moveSuggestion[] = new
+                                    $this->moveSuggestion[] = new MovieSuggestion($dayOpt->nodeValue, $moviesJson["time"], $movieOpt->nodeValue);
                                 }
                             }
-
                         }
                     }
                 }
             }
         }
-
     }
 
+    public function scrapeDinnerSuggestions($href){
+
+        $data = $this->curl_get_request($this->baseUrl . $href);
+
+        $dom = new \DOMDocument();
+
+        if($dom->loadHTML($data)){
+            $domXpath = new \DOMXPath($dom);
+
+            foreach($this->arrayOfAvailableDays as $days){
+                $prefix = $this->getPrefix($days);
+
+            }
+
+
+        }
+    }
     public function scrapeCalendars(){
         $arr = array();
         $arr[] = $this->scrapeCalendarDays("/calendar/peter.html");
@@ -137,6 +147,17 @@ class WebScraper{
                 return "Lördag";
             case "sunday":
                 return "Söndag";
+        }
+    }
+
+    private function getPrefix($days){
+        switch($days){
+            case "Fredag":
+                return "fre";
+            case "Lördag":
+                return "lor";
+            case "Söndag":
+                return "son";
         }
     }
 

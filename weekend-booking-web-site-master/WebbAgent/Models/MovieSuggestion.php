@@ -18,7 +18,9 @@ class MovieSuggestion
     public $movieName;
 
 
-    public function  __constuct($day, $time, $movieName){
-
+    public function  __construct($day, $time, $movieName){
+        $this->day = $day;
+        $this->time = $time;
+        $this->movieName = $movieName;
     }
 }
