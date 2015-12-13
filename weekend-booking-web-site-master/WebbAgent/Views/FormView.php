@@ -12,4 +12,8 @@ class FormView{
         ';
 
     }
+
+    public  function (){
+
+    }
 }

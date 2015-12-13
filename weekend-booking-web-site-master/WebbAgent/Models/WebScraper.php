@@ -17,17 +17,24 @@ class WebScraper{
 
     private $movieQuery = '//select[@id="movie"]/option[not(@disabled)]';
 
+    private $dinnerQuery = '//input/value';
+
     private $baseUrl = 'localhost:8080';
 
     private $arrayOfAvailableDays = array();
 
-    private $moveSuggestion = array();
+    private $movieSuggestion = array();
+
 
 
     public function scrape() {
         $this->scrapeCalendars();
         $this->scrapeMovieSuggestions("/cinema");
         $this->scrapeDinnerSuggestions("/dinner");
+    }
+
+    public function __construct(){
+        libxml_use_internal_errors(TRUE);
     }
 
 
@@ -82,7 +89,7 @@ class WebScraper{
                             foreach($jsonCode as $moviesJson){
                                 if($moviesJson["status"] === 1){
 
-                                    $this->moveSuggestion[] = new MovieSuggestion($dayOpt->nodeValue, $moviesJson["time"], $movieOpt->nodeValue);
+                                    $this->movieSuggestion[] = new Suggestions($dayOpt->nodeValue, $moviesJson["time"], $movieOpt->nodeValue);
                                 }
                             }
                         }
@@ -98,17 +105,35 @@ class WebScraper{
 
         $dom = new \DOMDocument();
 
-        if($dom->loadHTML($data)){
+        if($dom->loadHTML($data)) {
             $domXpath = new \DOMXPath($dom);
 
-            foreach($this->arrayOfAvailableDays as $days){
+
+
+            foreach ($this->arrayOfAvailableDays as $days => $value) {
                 $prefix = $this->getPrefix($days);
 
+                $dinner = $domXpath->query('//input[contains(@value, "' . $prefix .'")]');
+                foreach($this->movieSuggestion as $suggestion){
+
+
+                    if($suggestion->getDay() === $days){
+                        foreach($dinner as $dinnerTimes){
+                            $checkDinnerTime = substr($dinnerTimes->getAttribute("value"), 3, 2);
+                            $checkMovieTime = substr($suggestion->getTime(), 0, 2);
+
+                            if(intval($checkMovieTime) + 2 <= intval($checkDinnerTime)){
+                                $suggestion->addAvaliableTime(strtotime($checkDinnerTime . ":00"));
+                                var_dump($suggestion->getAvaliableTimes());
+                            }
+                        }
+                    }
+                }
             }
-
-
         }
     }
+
+
     public function scrapeCalendars(){
         $arr = array();
         $arr[] = $this->scrapeCalendarDays("/calendar/peter.html");
@@ -134,7 +159,7 @@ class WebScraper{
         // St�ng cUrl resurs
         curl_close($ch);
 
-        // Skriv ut och se vad vi har f�tt
+        // Skriv ut och se vad vi har fått
 
         return $data;
     }
