@@ -6,22 +6,23 @@ class LayoutView {
 
     private $formViewInput;
 
-    public function __construct($charset){
-        $this->charset = $charset;
-    }
 
-    public function Layout($title, $body) {
+    public function Layout($html) {
 
-        return "<!DOCTYPE html>
+        echo '<!DOCTYPE html>
         <html>
             <head>
-                <meta charset=\"" . $this->charset . "\">
-                <title>Webagent</title>
+                <head>
+                    <meta charset="utf-8">
+					<title>Webagent</title>
+                </head>
             </head>
             <body>
-                $body
+                <div id= "content">
+                 '. $this->'
+                </div>
             </body>
-        </html>";
+        </html>';
     }
 
 }
